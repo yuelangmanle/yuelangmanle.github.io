@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文文老师专属图片处理工具</title>
+    <style>
+        :root {
+            --primary: #9c27b0;
+            --secondary: #7e57c2;
+            --accent: #ff9800;
+            --dark: #4527a0;
+            --light: #f3e5f5;
+            --warning: #e74c3c;
+            --success: #2ecc71;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #7b1fa2 0%, #4527a0 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(156, 39, 176, 0.2), rgba(126, 87, 194, 0.3));
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            color: #fff;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #ffeb3b;
+            font-weight: 500;
+        }
+        
+        .brand {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-top: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+        }
+        
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 550px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: var(--dark);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+        
+        .upload-area:hover {
+            background-color: #f3e5f5;
+            border-color: #7b1fa2;
+        }
+        
+        .upload-icon {
+            font-size: 60px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            margin: 10px 5px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn:hover {
+            background: #7b1fa2;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-compress {
+            background: var(--secondary);
+        }
+        
+        .btn-compress:hover {
+            background: #5e35b1;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            color: #333;
+        }
+        
+        .btn-accent:hover {
+            background: #ef6c00;
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background: #c0392b;
+        }
+        
+        .result-container {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            max-height: 300px;
+        }
+        
+        .info {
+            background: #f3e5f5;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            position: relative;
+        }
+        
+        .signature {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        /* 批量处理样式 */
+        .batch-section {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .batch-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .batch-controls button {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .file-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .file-size {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .rename-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .rename-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .download-all {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .excel-section {
+            background: #f3e5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+        
+        .excel-table th, .excel-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .excel-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .size-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        
+        .size-ok {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .size-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .special-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            transform: rotate(5deg);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .powered-by {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .compression-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-bg"></div>
+            <div class="header-content">
+                <h1>文文老师专属图片处理工具</h1>
+                <p class="subtitle">专业级图片压缩 + Excel重命名功能</p>
+                <div class="brand">100KB以下压缩保证 · 批量打包下载</div>
+                <div class="special-tag">by 邓梓杰</div>
+            </div>
+        </header>
+
+        <div class="card-container">
+            <div class="card">
+                <div class="card-header">
+                    <span>批量图片处理</span>
+                    <span id="fileCount">0 个文件</span>
+                </div>
+                <div class="card-body">
+                    <div class="upload-area" id="dropArea">
+                        <div class="upload-icon">📁</div>
+                        <h3>拖放图片到此处或点击上传</h3>
+                        <p>支持批量上传 JPG, PNG, GIF, WebP 格式图片</p>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+                        <button class="btn btn-accent pulse" onclick="document.getElementById('fileInput').click()">选择图片</button>
+                    </div>
+                    
+                    <div class="info">
+                        <p><strong>专业压缩保证：</strong></p>
+                        <p>✅ 所有图片保证压缩至100KB以下</p>
+                        <p>✅ 超大图片智能尺寸缩减技术</p>
+                        <p>✅ 保留最佳视觉质量</p>
+                        <p>✅ 一键打包下载所有图片</p>
+                    </div>
+                    
+                    <div class="batch-section" id="batchSection">
+                        <div class="batch-controls">
+                            <button class="btn btn-compress" onclick="compressBatch()">批量压缩图片</button>
+                            <button class="btn" onclick="downloadExcelTemplate()">下载重命名模板</button>
+                            <button class="btn" onclick="document.getElementById('excelInput').click()">导入Excel重命名</button>
+                            <input type="file" id="excelInput" class="file-input" accept=".xlsx,.xls" style="display: none;">
+                        </div>
+                        
+                        <div class="file-list" id="fileList">
+                            <!-- 文件列表会动态生成 -->
+                        </div>
+                        
+                        <div class="progress-container">
+                            <p>处理进度: <span id="progressText">0%</span></p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="compression-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="originalTotal">0 KB</div>
+                                <div class="stat-label">原始大小</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="compressedTotal">0 KB</div>
+                                <div class="stat-label">压缩后大小</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="savings">0%</div>
+                                <div class="stat-label">节省空间</div>
+                            </div>
+                        </div>
+                        
+                        <div class="success-message" id="successMessage">
+                            ✅ 所有图片处理完成！准备下载
+                        </div>
+                        
+                        <div class="download-all" id="downloadAll">
+                            <button class="btn btn-success" onclick="downloadAllAsZip()">打包下载所有图片</button>
+                            <p style="margin-top: 15px; color: #666;">下载包含所有压缩图片的ZIP压缩包</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span>高级功能与说明</span>
+                    <span>⚙️</span>
+                </div>
+                <div class="card-body">
+                    <div class="excel-section">
+                        <h3>Excel重命名功能</h3>
+                        <p>1. 点击"下载重命名模板"按钮获取Excel模板</p>
+                        <p>2. 在Excel中填写新文件名（不需要扩展名）</p>
+                        <p>3. 点击"导入Excel重命名"导入文件</p>
+                        <p>4. 系统将自动应用新的文件名</p>
+                        
+                        <table class="excel-table">
+                            <thead>
+                                <tr>
+                                    <th>原始文件名</th>
+                                    <th>新文件名</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>IMG_001.jpg</td>
+                                    <td>产品展示-1</td>
+                                </tr>
+                                <tr>
+                                    <td>IMG_002.png</td>
+                                    <td>产品展示-2</td>
+                                </tr>
+                                <tr>
+                                    <td>photo123.jpeg</td>
+                                    <td>公司活动</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info">
+                        <p><strong>压缩技术说明：</strong></p>
+                        <p>1. 采用智能压缩算法，保证所有图片压缩到100KB以下</p>
+                        <p>2. 对于大尺寸图片，自动调整尺寸和质量</p>
+                        <p>3. 专业级视觉质量保留技术</p>
+                        <p>4. 所有处理在浏览器中完成，不上传服务器</p>
+                    </div>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">💯</div>
+                            <h3>100KB保证</h3>
+                            <p>所有图片压缩达标</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">📦</div>
+                            <h3>打包下载</h3>
+                            <p>一键下载所有图片</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🔒</div>
+                            <h3>隐私保护</h3>
+                            <p>本地处理不上传</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 文文老师专属图片处理工具 | 专业级图片压缩解决方案</p>
+        <div class="signature">定制开发：邓梓杰 | 技术支持：3335196397@qq.com</div>
+        <div class="powered-by">
+            <span>技术支持：HTML5 Canvas · JavaScript · SheetJS · JSZip</span>
+        </div>
+    </footer>
+
+    <!-- 引入SheetJS库用于处理Excel文件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- 引入JSZip库用于打包下载 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        // 存储所有文件数据
+        let files = [];
+        let compressedFiles = [];
+        const maxSizeKB = 100; // 最大100KB
+        let totalOriginalSize = 0;
+        let totalCompressedSize = 0;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置文件输入事件
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFiles(e.target.files);
+                }
+            });
+
+            // 设置Excel导入事件
+            document.getElementById('excelInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleExcelFile(e.target.files[0]);
+                }
+            });
+
+            // 设置拖放区域事件
+            const dropArea = document.getElementById('dropArea');
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                dropArea.style.backgroundColor = '#f3e5f5';
+                dropArea.style.borderColor = '#7b1fa2';
+            }
+
+            function unhighlight() {
+                dropArea.style.backgroundColor = '#f8f9fa';
+                dropArea.style.borderColor = '#9c27b0';
+            }
+
+            dropArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                handleFiles(dt.files);
+            }
+        });
+
+        // 处理多个文件
+        function handleFiles(fileList) {
+            files = [];
+            compressedFiles = [];
+            totalOriginalSize = 0;
+            totalCompressedSize = 0;
+            
+            // 过滤非图片文件
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                if (file.type.match('image.*')) {
+                    totalOriginalSize += file.size;
+                    files.push({
+                        file: file,
+                        name: file.name,
+                        compressed: false,
+                        newName: file.name.replace(/\.[^/.]+$/, "") // 移除扩展名
+                    });
+                }
+            }
+            
+            if (files.length === 0) {
+                alert('请选择图片文件！');
+                return;
+            }
+            
+            // 更新文件计数
+            document.getElementById('fileCount').textContent = files.length + ' 个文件';
+            updateSizeStats();
+            
+            // 显示批量处理区域
+            document.getElementById('batchSection').style.display = 'block';
+            document.getElementById('downloadAll').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // 生成文件列表
+            renderFileList();
+        }
+
+        // 渲染文件列表
+        function renderFileList() {
+            const fileListEl = document.getElementById('fileList');
+            fileListEl.innerHTML = '';
+            
+            files.forEach((fileData, index) => {
+                const file = fileData.file;
+                const fileSizeKB = (file.size / 1024).toFixed(2);
+                const fileType = file.name.split('.').pop().toUpperCase();
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-icon">📷</div>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${fileSizeKB} KB | ${fileType}</div>
+                        <div class="rename-section">
+                            <input type="text" class="rename-input" 
+                                value="${fileData.newName}" 
+                                data-index="${index}"
+                                placeholder="输入新文件名">
+                            <button class="btn" onclick="updateFileName(${index})">应用</button>
+                        </div>
+                    </div>
+                    <div class="file-status">${fileData.compressed ? '<span class="size-indicator size-ok">✓ 已压缩</span>' : '<span class="size-indicator size-warning">待处理</span>'}</div>
+                `;
+                
+                fileListEl.appendChild(fileItem);
+            });
+        }
+
+        // 更新文件名
+        function updateFileName(index) {
+            const input = document.querySelector(`.rename-input[data-index="${index}"]`);
+            if (input) {
+                files[index].newName = input.value;
+                alert(`文件名已更新: ${files[index].name} -> ${files[index].newName}`);
+            }
+        }
+
+        // 批量压缩图片
+        function compressBatch() {
+            if (files.length === 0) {
+                alert('请先选择图片！');
+                return;
+            }
+            
+            // 重置进度
+            updateProgress(0);
+            compressedFiles = [];
+            totalCompressedSize = 0;
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // 处理每个文件
+            let processed = 0;
+            
+            files.forEach((fileData, index) => {
+                compressImage(fileData.file).then(compressedData => {
+                    // 保存压缩结果
+                    const fileName = fileData.newName + '.' + getFileExtension(fileData.file.name);
+                    compressedFiles.push({
+                        dataUrl: compressedData.dataUrl,
+                        name: fileName,
+                        originalName: fileData.file.name,
+                        size: compressedData.size
+                    });
+                    
+                    // 更新文件状态
+                    files[index].compressed = true;
+                    totalCompressedSize += compressedData.size;
+                    
+                    // 更新进度
+                    processed++;
+                    updateProgress(Math.round((processed / files.length) * 100));
+                    
+                    // 更新大小统计
+                    updateSizeStats();
+                    
+                    // 全部处理完成
+                    if (processed === files.length) {
+                        document.getElementById('downloadAll').style.display = 'block';
+                        document.getElementById('successMessage').style.display = 'block';
+                        renderFileList();
+                    }
+                }).catch(error => {
+                    console.error('压缩错误:', error);
+                    alert(`图片 ${fileData.name} 压缩失败: ${error.message}`);
+                    processed++;
+                    updateProgress(Math.round((processed / files.length) * 100));
+                });
+            });
+        }
+
+        // 压缩单个图片 - 保证100KB以下
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            // 初始设置
+                            let targetWidth = img.width;
+                            let targetHeight = img.height;
+                            let quality = 0.85;
+                            let compressedDataUrl;
+                            let compressedSizeKB;
+                            
+                            // 最大尝试次数
+                            let attempts = 0;
+                            const maxAttempts = 20;
+                            
+                            do {
+                                // 设置画布尺寸
+                                canvas.width = targetWidth;
+                                canvas.height = targetHeight;
+                                
+                                // 清除画布
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                
+                                // 绘制图像到画布
+                                ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                                
+                                // 获取压缩后的数据URL
+                                compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                                
+                                // 计算大小
+                                compressedSizeKB = Math.round((compressedDataUrl.length * 3 / 4) / 1024);
+                                
+                                // 调整参数
+                                if (compressedSizeKB > maxSizeKB) {
+                                    if (quality > 0.5) {
+                                        // 先降低质量
+                                        quality -= 0.1;
+                                    } else if (targetWidth > 800 || targetHeight > 800) {
+                                        // 如果图片很大，按比例缩小
+                                        const scale = 0.9;
+                                        targetWidth = Math.floor(targetWidth * scale);
+                                        targetHeight = Math.floor(targetHeight * scale);
+                                    } else {
+                                        // 最后手段：大幅降低质量
+                                        quality -= 0.2;
+                                    }
+                                }
+                                
+                                attempts++;
+                                if (attempts > maxAttempts) {
+                                    throw new Error('压缩尝试次数超过限制');
+                                }
+                                
+                            } while (compressedSizeKB > maxSizeKB && quality > 0.1);
+                            
+                            resolve({
+                                dataUrl: compressedDataUrl,
+                                size: compressedDataUrl.length * 3 / 4 // 近似大小
+                            });
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('图片加载失败'));
+                    };
+                    
+                    img.src = e.target.result;
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('文件读取失败'));
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 更新进度条
+        function updateProgress(percent) {
+            document.getElementById('progressText').textContent = percent + '%';
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        // 更新大小统计
+        function updateSizeStats() {
+            document.getElementById('originalTotal').textContent = (totalOriginalSize / 1024).toFixed(0) + ' KB';
+            
+            if (totalCompressedSize > 0) {
+                document.getElementById('compressedTotal').textContent = (totalCompressedSize / 1024).toFixed(0) + ' KB';
+                const savings = 100 - (totalCompressedSize / totalOriginalSize * 100);
+                document.getElementById('savings').textContent = savings.toFixed(0) + '%';
+            }
+        }
+
+        // 打包下载所有图片
+        function downloadAllAsZip() {
+            if (compressedFiles.length === 0) {
+                alert('请先压缩图片！');
+                return;
+            }
+            
+            alert('正在创建压缩包，请稍候...');
+            
+            try {
+                // 创建ZIP文件
+                const zip = new JSZip();
+                
+                compressedFiles.forEach(file => {
+                    // 将dataURL转换为Blob
+                    const blob = dataURLtoBlob(file.dataUrl);
+                    zip.file(file.name, blob);
+                });
+                
+                // 生成ZIP文件并下载
+                zip.generateAsync({type:"blob"})
+                .then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = "文文老师_压缩图片包.zip";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    alert('压缩包下载完成！');
+                });
+            } catch (error) {
+                console.error('打包错误:', error);
+                alert('创建压缩包失败: ' + error.message);
+            }
+        }
+        
+        // 将dataURL转换为Blob
+        function dataURLtoBlob(dataurl) {
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            
+            return new Blob([u8arr], {type: mime});
+        }
+
+        // 获取文件扩展名
+        function getFileExtension(fileName) {
+            return fileName.split('.').pop().toLowerCase();
+        }
+
+        // 下载Excel模板
+        function downloadExcelTemplate() {
+            try {
+                // 创建示例数据
+                const data = [
+                    ['原始文件名', '新文件名'],
+                    ['IMG_001.jpg', '产品展示-1'],
+                    ['IMG_002.png', '产品展示-2'],
+                    ['photo123.jpeg', '公司活动']
+                ];
+                
+                // 创建工作簿
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "重命名模板");
+                
+                // 生成Excel文件并下载
+                XLSX.writeFile(wb, "图片重命名模板.xlsx");
+            } catch (error) {
+                console.error('Excel模板错误:', error);
+                alert('生成Excel模板失败: ' + error.message);
+            }
+        }
+
+        // 处理Excel文件
+        function handleExcelFile(excelFile) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // 获取第一个工作表
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    
+                    // 检查标题行
+                    if (jsonData.length < 1 || jsonData[0][0] !== '原始文件名' || jsonData[0][1] !== '新文件名') {
+                        alert('Excel格式不正确，请使用下载的模板格式');
+                        return;
+                    }
+                    
+                    // 创建文件名映射
+                    const nameMap = {};
+                    for (let i = 1; i < jsonData.length; i++) {
+                        if (jsonData[i].length >= 2 && jsonData[i][0] && jsonData[i][1]) {
+                            nameMap[jsonData[i][0]] = jsonData[i][1];
+                        }
+                    }
+                    
+                    // 应用重命名
+                    files.forEach((fileData, index) => {
+                        if (nameMap[fileData.name]) {
+                            fileData.newName = nameMap[fileData.name];
+                        }
+                    });
+                    
+                    // 更新UI
+                    renderFileList();
+                    alert('重命名规则已应用！');
+                } catch (error) {
+                    console.error('Excel处理错误:', error);
+                    alert('处理Excel文件失败: ' + error.message);
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('读取Excel文件失败');
+            };
+            
+            reader.readAsArrayBuffer(excelFile);
+        }
+    </script>
+</body>
+</html>
